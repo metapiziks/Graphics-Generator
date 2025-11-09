@@ -1,0 +1,747 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Occasion GIF Text Generator V8</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base styles and dark theme for aesthetics */
+        :root {
+            --text-color: #fff;
+            --bg-color: #1f2937; /* Dark slate gray */
+            --accent-color: #f59e0b; /* Amber 500 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+
+        /* --- BACKGROUND KEYFRAMES & STYLES --- */
+
+
+        /* Standard Backgrounds */
+        @keyframes fireworks-bg { 0%, 100% { background-position: 0% 0%; } 25% { background-position: 50% 100%; } 50% { background-position: 100% 50%; } 75% { background-position: 50% 0%; } }
+        .bg-fireworks {
+            background-image: radial-gradient(circle at 10% 50%, rgba(255, 0, 0, 0.5) 0%, transparent 10%), radial-gradient(circle at 90% 80%, rgba(255, 255, 0, 0.5) 0%, transparent 15%), radial-gradient(circle at 50% 20%, rgba(0, 255, 255, 0.5) 0%, transparent 12%);
+            background-size: 200% 200%;
+            animation: fireworks-bg 15s infinite linear;
+        }
+        @keyframes lightning-bg { 0%, 20%, 40%, 60%, 80%, 100% { filter: brightness(1); } 10%, 30%, 50%, 70%, 90% { filter: brightness(1.5); } }
+        .bg-lightning { background-color: #0d1117; box-shadow: inset 0 0 100px #3b82f6; animation: lightning-bg 0.5s infinite steps(1); }
+        @keyframes sun-rising-bg { 0% { background-color: #fde68a; } 50% { background-color: #f97316; } 100% { background-color: #fde68a; } }
+        .bg-sun-rising { background-image: linear-gradient(to top, #fcd34d, #f97316, #ef4444); background-size: 200% 200%; animation: sun-rising-bg 10s infinite alternate-reverse; }
+
+
+        /* New Dynamic Backgrounds */
+        @keyframes disco-lights { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+        .bg-disco { background-image: repeating-conic-gradient(from 0deg, #ff00ff 0% 5%, #00ffff 5% 10%, #ffff00 10% 15%, transparent 15% 20%); background-size: 400% 400%; animation: disco-lights 6s infinite linear; }
+        @keyframes psychedelic-swirl { 0% { background-position: 0% 0%; background-size: 400% 400%; } 100% { background-position: 100% 100%; background-size: 200% 200%; } }
+        .bg-psychedelic { background-color: #100018; background-image: radial-gradient(circle at 10% 90%, #f97316 0%, transparent 20%), radial-gradient(circle at 90% 10%, #be185d 0%, transparent 15%), linear-gradient(45deg, #a78bfa, #3b82f6); background-size: 300% 300%; animation: psychedelic-swirl 12s infinite alternate; }
+        @keyframes universe-swirl { 0% { background-position: 0% 0%, 50% 50%, 100% 100%; } 100% { background-position: 100% 100%, 0% 0%, 50% 50%; } }
+        .bg-universe { background-color: #00001a; background-image: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1%), radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.3) 10%, transparent 25%), radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.05) 1px, transparent 1%); background-size: 50px 50px, 400px 400px, 30px 30px; animation: universe-swirl 30s infinite linear; }
+        @keyframes cosmic-slow { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+        .bg-planets { background-color: #0d1117; background-image: radial-gradient(circle at 20% 20%, #facc15 0%, transparent 15%), radial-gradient(circle at 80% 80%, #34d399 0%, transparent 10%); background-size: 200% 200%; animation: cosmic-slow 40s infinite linear; }
+        @keyframes bw-shift { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+        .bg-bw-shift { background-image: linear-gradient(45deg, #000000 0%, #ffffff 50%, #000000 100%); background-size: 400% 400%; animation: bw-shift 6s infinite alternate; }
+
+
+        /* Curtain Reveal Effect */
+        .bg-curtain-reveal { position: relative; overflow: hidden; background-color: #0d1117; }
+        .bg-curtain-reveal::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 50%;
+            background-color: #881b1b; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); z-index: 20;
+            animation: curtain-left-close 10s infinite;
+        }
+        .bg-curtain-reveal::after {
+            content: ''; position: absolute; top: 0; bottom: 0; right: 0; width: 50%;
+            background-color: #881b1b; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); z-index: 20;
+            animation: curtain-right-close 10s infinite;
+        }
+        @keyframes curtain-left-close { 0%, 15%, 85%, 100% { transform: translateX(0); } 30%, 70% { transform: translateX(-100%); } }
+        @keyframes curtain-right-close { 0%, 15%, 85%, 100% { transform: translateX(0); } 30%, 70% { transform: translateX(100%); } }
+
+
+
+
+        /* --- MOVEMENT KEYFRAMES & STYLES --- */
+
+
+        /* Pulsating */
+        @keyframes text-pulsate { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        .move-pulsate { animation: text-pulsate 1.5s infinite ease-in-out; }
+
+
+        /* Rotating */
+        @keyframes text-rotate { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        .move-rotate { animation: text-rotate 4s infinite linear; transform-style: preserve-3d; }
+
+
+        /* Breathing (Slow, subtle scaling) */
+        @keyframes text-breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .move-breath { animation: text-breath 2.5s infinite ease-in-out; }
+
+
+        /* NEW: Fly In from Borders */
+        @keyframes letter-fly-in {
+            0% { opacity: 0; transform: translate(var(--start-x), var(--start-y)) scale(0.5) rotate(720deg); }
+            80% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+        }
+        .move-fly-in .letter {
+            display: inline-block;
+            opacity: 0;
+            animation: letter-fly-in 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+        }
+
+
+        /* --- TEXT MATERIAL STYLES --- */
+        .text-material {
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 900;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); 
+            z-index: 25; 
+            position: relative;
+        }
+        
+        /* Material Definitions */
+        .material-metal { background-image: linear-gradient(180deg, #e5e7eb, #9ca3af, #4b5563, #9ca3af, #e5e7eb); -webkit-text-stroke: 1px #4b5563; }
+        .material-crystal { background-image: linear-gradient(45deg, #a5f3fc, #e0f2f1, #06b6d4, #a5f3fc); text-shadow: 0 0 15px #a5f3fc, 0 0 30px #06b6d4; }
+        .material-wood { background-image: linear-gradient(135deg, #78350f, #a16207, #d97706, #a16207, #78350f); -webkit-text-stroke: 1px #78350f; }
+        .material-bricks { background-image: linear-gradient(180deg, #ef4444, #b91c1c, #991b1b, #b91c1c, #ef4444); letter-spacing: 0.1em; }
+        .material-solid-color {
+            color: var(--solid-font-color, #ffffff); 
+            background-image: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+            -webkit-text-stroke: 0;
+        }
+
+
+        /* --- FONT STYLES --- */
+        .font-impact-style { font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; }
+        .font-handwriting-style { font-family: 'Brush Script MT', 'Brush Script Std', cursive; }
+        .font-blocky-style { font-family: 'Rockwell', 'Courier Bold', Courier, monospace; }
+        .font-geometric-style { font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif; }
+        .font-tech-style { font-family: 'Consolas', 'Courier New', monospace; }
+        .font-fantasy-style { font-family: 'Copperplate', fantasy; }
+
+
+        /* Icon styling */
+        .icon-style {
+            display: inline-block; margin: 0 10px; font-size: 1.2em; line-height: 1; z-index: 25; position: relative;
+        }
+
+
+        /* Message Box and Recording Indicator */
+        #messageBox {
+            position: fixed; top: 20px; right: 20px; background-color: #10b981; color: white;
+            padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000; opacity: 0; transition: opacity 0.5s ease-in-out;
+        }
+        .show-message { opacity: 1 !important; }
+
+
+        #recordingIndicator {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background-color: #dc2626; /* Red 600 */
+            color: white; padding: 8px 16px; border-radius: 9999px; font-weight: bold;
+            display: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .blinking { animation: blink 1s infinite; }
+
+
+        /* Hidden Canvas for MediaRecorder Stream */
+        #recordingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5; /* Below curtain/text */
+            opacity: 0; /* Hidden */
+        }
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row p-4 gap-6">
+
+
+    <!-- Notification Message Box -->
+    <div id="messageBox" role="alert"></div>
+    
+    <!-- Recording Indicator -->
+    <div id="recordingIndicator" class="blinking">
+        🔴 RECORDING (3s)
+    </div>
+
+
+    <!-- 1. Customization Panel (Left/Top) -->
+    <div class="lg:w-1/3 w-full bg-gray-800 p-6 rounded-xl shadow-2xl space-y-4 h-fit">
+        <h2 class="text-xl font-bold border-b pb-2 border-gray-700 text-amber-400">GIF Text Customizer</h2>
+
+
+        <!-- Text Input (TextArea) -->
+        <div>
+            <label for="mainText" class="block text-sm font-medium mb-1">Main Text (Use Enter for new lines)</label>
+            <textarea id="mainText" rows="3" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white" maxlength="150">GRAND
+UNVEILING</textarea>
+        </div>
+        
+        <!-- Font Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Font Style</label>
+            <select id="fontSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="font-impact-style">1. Impact</option>
+                <option value="font-handwriting-style">2. Handwriting</option>
+                <option value="font-blocky-style">3. Blocky Serif</option>
+                <option value="font-geometric-style" selected>4. Geometric Sans</option>
+                <option value="font-tech-style">5. Tech Monospace</option>
+                <option value="font-fantasy-style">6. Fantasy</option>
+            </select>
+        </div>
+
+
+        <!-- Material Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Letter Material / Color</label>
+            <select id="materialSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="material-crystal" selected>Crystal (Gradient)</option>
+                <option value="material-metal">Metal (Gradient)</option>
+                <option value="material-wood">Wood (Gradient)</option>
+                <option value="material-bricks">Bricks (Gradient)</option>
+                <option value="material-solid-color">Solid Color (See below)</option>
+            </select>
+        </div>
+        
+        <!-- Font Color Picker (Only affects Solid Color option) -->
+        <div id="colorPickerContainer">
+            <label for="fontColor" class="block text-sm font-medium mb-1">Solid Font Color</label>
+            <div class="flex gap-2 items-center">
+                <input type="color" id="fontColor" value="#ffff00" class="w-12 h-8 rounded-lg border-2 border-gray-600 cursor-pointer">
+                <span id="hexValue" class="text-sm">#ffff00</span>
+            </div>
+        </div>
+
+
+
+
+        <!-- TOP Icon Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Top Icon (Prefix)</label>
+            <select id="topIconSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="">None</option>
+                <option value="⭐">⭐ Star</option>
+                <option value="🎂">🎂 Cake</option>
+                <option value="🎉">🎉 Party Popper</option>
+                <option value="💖" selected>💖 Heart</option>
+                <option value="🎁">🎁 Gift</option>
+                <option value="⚡">⚡ Lightning</option>
+            </select>
+        </div>
+
+
+        <!-- BOTTOM Icon Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Bottom Icon (Suffix)</label>
+            <select id="bottomIconSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="">None</option>
+                <option value="⭐">⭐ Star</option>
+                <option value="🎂">🎂 Cake</option>
+                <option value="🎉">🎉 Party Popper</option>
+                <option value="💖" selected>💖 Heart</option>
+                <option value="🎁">🎁 Gift</option>
+                <option value="⚡">⚡ Lightning</option>
+            </select>
+        </div>
+
+
+
+
+        <!-- Movement Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Text Movement</label>
+            <select id="movementSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="move-pulsate">Pulsating</option>
+                <option value="move-rotate">Rotating (3D)</option>
+                <option value="move-breath">Breathing (Subtle)</option>
+                <option value="move-fly-in" selected>Letters from Borders (Fly-In)</option>
+                <option value="">Static</option>
+            </select>
+        </div>
+
+
+        <!-- Background Effect Selection -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Background Effect</label>
+            <select id="backgroundSelect" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-amber-500 focus:border-amber-500 text-white">
+                <option value="bg-curtain-reveal" selected>Curtain Unveiling (Theatrical)</option>
+                <option value="bg-fireworks">Fireworks</option>
+                <option value="bg-lightning">Lightning Storm</option>
+                <option value="bg-sun-rising">Sun Rising Warm Glow</option>
+                <option value="bg-disco">Disco Lights (Mirror Ball)</option>
+                <option value="bg-psychedelic">Psychedelic Neon Swirl</option>
+                <option value="bg-universe">Swirling Universe</option>
+                <option value="bg-planets">Multiple Planets (Cosmic Orbit)</option>
+                <option value="bg-bw-shift">Shifting Black & White</option>
+                <option value="">Solid Dark</option>
+            </select>
+        </div>
+
+
+        <!-- Download Buttons -->
+        <div class="space-y-3 pt-4">
+             <button id="recordButton" class="w-full p-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-500 transition duration-200" disabled>
+                Record Animation (WebM)
+            </button>
+            <button id="downloadButton" class="w-full p-3 bg-amber-500 text-gray-900 font-bold rounded-lg shadow-lg hover:bg-amber-400 transition duration-200">
+                Capture Static PNG Snapshot
+            </button>
+        </div>
+    </div>
+
+
+    <!-- 2. GIF Preview Area (Right/Bottom) -->
+    <div id="previewContainer" class="flex-grow w-full lg:w-2/3 flex items-center justify-center p-4 min-h-[400px] rounded-xl shadow-2xl border-4 border-amber-500 transition-all duration-300 bg-curtain-reveal relative">
+        <!-- Hidden Canvas for MediaRecorder -->
+        <canvas id="recordingCanvas"></canvas> 
+        
+        <div id="previewTextWrapper" class="text-6xl sm:text-7xl md:text-8xl p-2 leading-none text-center font-extrabold move-fly-in" style="perspective: 1000px;">
+            <!-- Prefix Icon is now the top icon -->
+            <span id="prefixIcon" class="icon-style">💖</span>
+            <span id="mainTextContent" class="text-material material-crystal font-geometric-style">
+                <!-- Content will be injected by JS -->
+            </span>
+            <!-- Suffix Icon is now the bottom icon -->
+            <span id="suffixIcon" class="icon-style">💖</span>
+        </div>
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Global Variables
+        let mediaRecorder;
+        let recordedChunks = [];
+        const RECORDING_DURATION_MS = 3000; // 3 seconds
+
+
+        // DOM Elements
+        const mainText = document.getElementById('mainText');
+        const fontSelect = document.getElementById('fontSelect');
+        const materialSelect = document.getElementById('materialSelect');
+        const fontColor = document.getElementById('fontColor');
+        const hexValue = document.getElementById('hexValue');
+        // New separate icon selectors
+        const topIconSelect = document.getElementById('topIconSelect');
+        const bottomIconSelect = document.getElementById('bottomIconSelect');
+
+
+        const movementSelect = document.getElementById('movementSelect');
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const downloadButton = document.getElementById('downloadButton');
+        const recordButton = document.getElementById('recordButton');
+        const messageBox = document.getElementById('messageBox');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        
+        const previewContainer = document.getElementById('previewContainer');
+        const previewTextWrapper = document.getElementById('previewTextWrapper');
+        const mainTextContent = document.getElementById('mainTextContent');
+        const prefixIcon = document.getElementById('prefixIcon');
+        const suffixIcon = document.getElementById('suffixIcon');
+        const colorPickerContainer = document.getElementById('colorPickerContainer');
+        const recordingCanvas = document.getElementById('recordingCanvas');
+
+
+
+
+        /**
+         * Custom message box utility to replace alert().
+         * @param {string} message 
+         * @param {string} type 
+         */
+        function showMessage(message, type = 'success') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('show-message');
+            let color = type === 'error' ? '#ef4444' : '#10b981';
+            messageBox.style.backgroundColor = color;
+            requestAnimationFrame(() => {
+                messageBox.classList.add('show-message');
+            });
+            setTimeout(() => {
+                messageBox.classList.remove('show-message');
+            }, 3000);
+        }
+        
+        /**
+         * Generates the HTML content for the main text, handling line breaks and
+         * individual letter wrapping for the 'fly-in' effect.
+         */
+        function generateTextContent(rawText, movementClass) {
+            if (movementClass === 'move-fly-in') {
+                let html = '';
+                let charIndex = 0;
+                const lines = rawText.split('\n');
+
+
+                lines.forEach((line, lineIndex) => {
+                    if (lineIndex > 0) { html += '<br>'; }
+                    
+                    for (const char of line) {
+                        if (char === ' ') {
+                            html += '&nbsp;'; 
+                        } else {
+                            // Assign random starting coordinates
+                            let startX = '0', startY = '0';
+                            const rand = charIndex % 4; 
+                            if (rand === 0) { startY = '-1000px'; } 
+                            else if (rand === 1) { startX = '1000px'; } 
+                            else if (rand === 2) { startY = '1000px'; } 
+                            else { startX = '-1000px'; }
+
+
+                            html += `<span class="letter" style="--index: ${charIndex}; --start-x: ${startX}; --start-y: ${startY};">${char}</span>`;
+                        }
+                        charIndex++;
+                    }
+                });
+                return html;
+            } else {
+                return rawText.replace(/\n/g, '<br>');
+            }
+        }
+
+
+
+
+        /**
+         * Updates the preview container and text based on current selections.
+         */
+        function updatePreview() {
+            const rawText = mainText.value || "Your Text Here";
+            const fontClass = fontSelect.value;
+            const materialClass = materialSelect.value;
+            const movementClass = movementSelect.value;
+            const backgroundClass = backgroundSelect.value;
+            const selectedColor = fontColor.value;
+            
+            // Get separate icon selections
+            const topIcon = topIconSelect.value;
+            const bottomIcon = bottomIconSelect.value;
+
+
+
+
+            // 1. Update Text Content
+            mainTextContent.innerHTML = generateTextContent(rawText, movementClass);
+
+
+            // 2. Handle Color Picker Visibility
+            const isSolidColor = materialSelect.value === 'material-solid-color';
+            colorPickerContainer.style.display = isSolidColor ? 'block' : 'none';
+
+
+            // Update Hex Value display and CSS variable
+            hexValue.textContent = selectedColor;
+            previewTextWrapper.style.setProperty('--solid-font-color', selectedColor);
+            
+            // 3. Update Font and Material
+            mainTextContent.className = mainTextContent.className.split(' ').filter(c => 
+                !c.startsWith('font-') && !c.startsWith('material-')
+            ).join(' ');
+            mainTextContent.classList.add('text-material', fontClass, materialClass);
+            
+            // 4. Update Icons
+            prefixIcon.textContent = topIcon;
+            suffixIcon.textContent = bottomIcon;
+            
+            // 5. Apply Movement class
+            previewTextWrapper.classList.remove('move-rotate', 'move-fly-in');
+            mainTextContent.classList.remove('move-pulsate', 'move-breath');
+
+
+            if (movementClass === 'move-rotate' || movementClass === 'move-fly-in') {
+                previewTextWrapper.classList.add(movementClass);
+            } else {
+                mainTextContent.classList.add(movementClass);
+            }
+            
+            // 6. Update Background
+            previewContainer.className = previewContainer.className.split(' ').filter(c => 
+                !c.startsWith('bg-')
+            ).join(' ');
+
+
+            if (backgroundClass) {
+                previewContainer.classList.add(backgroundClass);
+            } else {
+                previewContainer.classList.add('bg-gray-900');
+            }
+
+
+            // Restore base classes
+             previewContainer.classList.add(
+                'flex-grow', 'w-full', 'lg:w-2/3', 'flex', 'items-center', 'justify-center', 'p-4', 
+                'min-h-[400px]', 'rounded-xl', 'shadow-2xl', 'border-4', 'border-amber-500', 
+                'transition-all', 'duration-300', 'relative'
+            );
+        }
+        
+        // --- Video Recording Logic ---
+        
+        let recorderAnimationId = null;
+
+
+        /**
+         * Draws the live animated DOM content to a hidden canvas for MediaRecorder to capture.
+         */
+        function drawFrameToCanvas() {
+            const width = previewContainer.offsetWidth;
+            const height = previewContainer.offsetHeight;
+
+
+            recordingCanvas.width = width;
+            recordingCanvas.height = height;
+
+
+            // Draw the DOM element onto the canvas repeatedly
+            const html = new XMLSerializer().serializeToString(previewContainer);
+            const svgString = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                    <style>
+                        ${document.head.querySelector('style').textContent}
+                        body { background-color: #1f2937; } 
+                        #previewContainer { overflow: visible !important; }
+                        /* Ensure the hidden canvas does not draw itself */
+                        #recordingCanvas { display: none !important; }
+                    </style>
+                    <foreignObject x="0" y="0" width="100%" height="100%">
+                        ${html}
+                    </foreignObject>
+                </svg>`;
+            
+            const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+            
+            const img = new Image();
+            const ctx = recordingCanvas.getContext('2d');
+
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, width, height);
+                // Continue drawing frames until the recording stops
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    recorderAnimationId = requestAnimationFrame(drawFrameToCanvas);
+                }
+            };
+            img.onerror = function() {
+                console.warn("Frame rendering skipped due to error.");
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    recorderAnimationId = requestAnimationFrame(drawFrameToCanvas);
+                }
+            };
+            img.src = dataUrl;
+        }
+
+
+
+
+        /**
+         * Starts the video recording process.
+         */
+        async function startRecording() {
+            recordButton.disabled = true;
+            downloadButton.disabled = true;
+            recordingIndicator.style.display = 'block';
+
+
+            const width = previewContainer.offsetWidth;
+            const height = previewContainer.offsetHeight;
+            recordingCanvas.width = width;
+            recordingCanvas.height = height;
+
+
+            try {
+                // 1. Get a stream from the canvas
+                const stream = recordingCanvas.captureStream(30); // 30 FPS
+
+
+                // 2. Initialize MediaRecorder
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                recordedChunks = [];
+
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create download link
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'animated_text_loop.webm';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+
+                    showMessage("Video recording complete and downloaded!", 'success');
+                    
+                    // Cleanup UI and state
+                    recordButton.disabled = false;
+                    downloadButton.disabled = false;
+                    recordingIndicator.style.display = 'none';
+                    cancelAnimationFrame(recorderAnimationId);
+                };
+
+
+                // 3. Start drawing frames and recording
+                mediaRecorder.start();
+                recorderAnimationId = requestAnimationFrame(drawFrameToCanvas);
+                showMessage("Recording started (3 seconds)...", 'success');
+
+
+                // 4. Stop recording after set duration
+                setTimeout(() => {
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                }, RECORDING_DURATION_MS);
+
+
+            } catch (error) {
+                console.error("Error starting media recording:", error);
+                showMessage(`Error: Recording failed. Your browser may not support WebM capture.`, 'error');
+                recordButton.disabled = false;
+                downloadButton.disabled = false;
+                recordingIndicator.style.display = 'none';
+                cancelAnimationFrame(recorderAnimationId);
+            }
+        }
+
+
+
+
+        /**
+         * Captures the current visual state of the preview container as a PNG image 
+         * using SVG and Canvas serialization (static snapshot).
+         */
+        function downloadPNGSnapshot() {
+            const node = previewContainer;
+            const width = node.offsetWidth;
+            const height = node.offsetHeight;
+            
+            const messageBoxVisibility = messageBox.style.display;
+            messageBox.style.display = 'none';
+
+
+            const isCurtainActive = previewContainer.classList.contains('bg-curtain-reveal');
+            if (isCurtainActive) { previewContainer.classList.remove('bg-curtain-reveal'); }
+
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width * 2; 
+            canvas.height = height * 2;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(2, 2);
+
+
+            const html = new XMLSerializer().serializeToString(node);
+            const svgString = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+                    <style>
+                        ${document.head.querySelector('style').textContent}
+                        body { background-color: #1f2937; } 
+                        #previewContainer { overflow: visible !important; }
+                        /* Freeze animations for static capture */
+                        .move-fly-in .letter, .move-pulsate, .move-breath, .move-rotate { animation-play-state: paused !important; }
+                    </style>
+                    <foreignObject width="100%" height="100%">
+                        ${html}
+                    </foreignObject>
+                </svg>`;
+            
+            const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+            
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const imageBase64 = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imageBase64;
+                    link.download = 'custom_text_snapshot.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+
+                    showMessage("Snapshot downloaded successfully!");
+                } catch (e) {
+                    console.error("Canvas drawing failed:", e);
+                    showMessage("Error: Failed to draw image to canvas. Try a simpler material.", 'error');
+                } finally {
+                    if (isCurtainActive) { previewContainer.classList.add('bg-curtain-reveal'); }
+                    messageBox.style.display = messageBoxVisibility;
+                }
+            };
+            img.onerror = function(e) {
+                 if (isCurtainActive) { previewContainer.classList.add('bg-curtain-reveal'); }
+                 messageBox.style.display = messageBoxVisibility;
+                 showMessage("Error: Could not process preview element.", 'error');
+            };
+            img.src = dataUrl;
+        }
+
+
+
+
+        // --- Event Listeners and Initial Setup ---
+        
+        mainText.addEventListener('input', updatePreview);
+        fontSelect.addEventListener('change', updatePreview);
+        materialSelect.addEventListener('change', updatePreview);
+        // Event listeners for the new icon selectors
+        topIconSelect.addEventListener('change', updatePreview);
+        bottomIconSelect.addEventListener('change', updatePreview);
+
+
+        movementSelect.addEventListener('change', updatePreview);
+        backgroundSelect.addEventListener('change', updatePreview);
+        fontColor.addEventListener('input', updatePreview);
+        
+        downloadButton.addEventListener('click', downloadPNGSnapshot);
+        recordButton.addEventListener('click', startRecording);
+
+
+        // Check for MediaRecorder support on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePreview();
+            if (window.MediaRecorder && HTMLCanvasElement.prototype.captureStream) {
+                recordButton.disabled = false;
+                recordButton.textContent = "Record Animation (WebM)";
+            } else {
+                recordButton.textContent = "Recording Not Supported";
+            }
+        });
+    </script>
+
+
+</body>
+</html>
